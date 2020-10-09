@@ -85,14 +85,13 @@ instacart %>%
   pivot_wider(
     names_from = order_dow,
     values_from = mean_hour
-  ) %>%
-  knitr::kable()
+  )
 ```
 
 
 ## Problem 2
 
-Load, tidy, and wrangle the accel data.
+Load, tidy, and wrangle the accel data. (Weekend vs weekday variable????????)
 ```{r}
 accel_data = 
   read.csv("./data/accel_data.csv") %>%
@@ -109,12 +108,105 @@ accel_data =
   )
 ```
 
-Aggregate across minutes to create a total activity variable for each day and create a table.
+Aggregate across minutes to create a total activity variable for each day and create a table. (Not giving numbers in table!!)
 
 ```{r}
-aggregate(accel_data,
-    by = list(accel_data$day),
-    FUN = second
-  )
+accel_data %>%
+  filter(day %in% c("Friday", "Saturday", "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday")) %>%
+  group_by(week, day) %>%
+  summarize(total_minutes = sum(minute), total_activity_counts = sum(activity_counts))
 ```
+
+Make a plot showing the 24-hour activity time courses for each day!
+
+```{r}
+accel_data
+  
+```
+
+## Problem 3
+
+```{r}
+library(p8105.datasets)
+data("ny_noaa")
+```
+
+Describe NY NOAA dataset.
+
+```{r}
+names(ny_noaa)
+head(ny_noaa)
+```
+
+The NY NOAA dataset has `r nrow(ny_noaa)` rows and `r ncol(ny_noaa)` columns. The dataset contains `r sum(is.na(ny_noaa))` total missing observations which could cause some issues in deducing important statistics. Important variables are the weather station ID, date of observation, precipitation (mm), snowfall, snow depth (mm), maximum temperature, and minimum temperature.
+
+Do some data cleaning!
+
+```{r}
+ny_noaa =
+ny_noaa %>%
+  janitor::clean_names() %>%
+   separate(
+        date, 
+        into = c('year', 'month', 'day'),
+        convert = TRUE
+      ) %>%
+  mutate(
+    tmax = as.numeric(tmax),
+    tmin = as.numeric(tmin),
+    tmax = tmax/10,
+    tmin = tmin/10,
+    prcp = prcp/10
+  ) %>%
+  drop_na()
+```
+
+The most commonly observed snowfall values (mm):
+
+```{r}
+sort(table(pull(ny_noaa, snow)),decreasing=TRUE)[2:3]
+```
+
+The most common values of snowfall are 25mm and 13mm. This could be because of the time of year the observations were successfully recorded. Perhaps, observations are also successfully measured in times of lighter snowfall.
+
+Make a two-panel plot!
+
+```{r not plotting?!}
+avg_max_temp_jan_July_df =
+  ny_noaa %>%
+  group_by(month, year, id) %>%
+  filter(month == 01, month == 07) %>%
+  summarize(average_max_temp = mean(tmax)
+  ) %>%
+  ggplot(aes(x = month, y = average_max_temp, group = id, color = id)) +
+  geom_point() +
+  facet_grid(. ~ month)
+```
+
+Make a two-panel plot showing tmax vs. tmin for the full dataset.
+
+```{r not plotting?!}
+tmax_tmin_p =
+  ny_noaa %>%
+  summarize(average_max_temp = mean(tmax), average_min_temp = mean(tmin)
+  ) %>%
+  ggplot(aes(x = average_max_temp, y = average_min_temp)) +
+  geom_boxplot() +
+  labs(title = "Average Max Temp vs. Average Min Temp",
+       x = "Average Max Temp",
+       y = "Average Min Temp")
+
+snow_fall_p =
+  ny_noaa %>%
+  group_by(year) %>%
+  filter('snow' > 0, 'snow' < 100) %>%
+  ggplot(aes(x = year, y = snow, color = year)) +
+  labs(title = "Distribution of Snowfall (mm) by Year")
+```
+
+
+
+
+
+
 
