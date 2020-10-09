@@ -102,6 +102,7 @@ accel_data =
     names_prefix = "activity.",
     values_to = "activity counts",
   ) %>%
+  janitor::clean_names() %>%
   mutate(
     minute = as.numeric(minute),
     day = as.factor(day)
@@ -112,8 +113,8 @@ Aggregate across minutes to create a total activity variable for each day and cr
 
 ```{r}
 aggregate(accel_data,
-    by = list(accel_data$day, accel_data$minute),
-    FUN = sum
+    by = list(accel_data$day),
+    FUN = second
   )
 ```
 
