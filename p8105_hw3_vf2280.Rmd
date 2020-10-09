@@ -90,3 +90,30 @@ instacart %>%
 ```
 
 
+## Problem 2
+
+Load, tidy, and wrangle the accel data.
+```{r}
+accel_data = 
+  read.csv("./data/accel_data.csv") %>%
+  pivot_longer(
+    activity.1:activity.1440,
+    names_to = "minute",
+    names_prefix = "activity.",
+    values_to = "activity counts",
+  ) %>%
+  mutate(
+    minute = as.numeric(minute),
+    day = as.factor(day)
+  )
+```
+
+Aggregate across minutes to create a total activity variable for each day and create a table.
+
+```{r}
+aggregate(accel_data,
+    by = list(accel_data$day, accel_data$minute),
+    FUN = sum
+  )
+```
+
