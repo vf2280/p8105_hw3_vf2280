@@ -91,7 +91,7 @@ instacart %>%
 
 ## Problem 2
 
-Load, tidy, and wrangle the accel data. (Weekend vs weekday variable????????)
+Load, tidy, and wrangle the accel data.
 ```{r}
 accel_data = 
   read.csv("./data/accel_data.csv") %>%
@@ -104,17 +104,31 @@ accel_data =
   janitor::clean_names() %>%
   mutate(
     minute = as.numeric(minute),
-    day = as.factor(day)
+    day = as.factor(day),
+    weekend_vs_weekday = case_when(
+      day == "Saturday" ~ "weekend",
+      day == "Sunday" ~ "weekend",
+      day == "Monday" ~ "weekday",
+      day == "Tuesday" ~ "weekday",
+      day == "Wednesday" ~ "weekday",
+      day == "Thursday" ~ "weekday",
+      day == "Friday" ~ "weekday",
+    )
   )
 ```
 
-Aggregate across minutes to create a total activity variable for each day and create a table. (Not giving numbers in table!!)
+
+Aggregate across minutes to create a total activity variable for each day and create a table.
 
 ```{r}
 accel_data %>%
   filter(day %in% c("Friday", "Saturday", "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday")) %>%
   group_by(week, day) %>%
-  summarize(total_minutes = sum(minute), total_activity_counts = sum(activity_counts))
+  summarize(total_minutes = sum(minute), total_activity_counts = sum(activity_counts)) %>%
+  pivot_wider(
+    names_from = day,
+    values_from = total_activity_counts
+  )
 ```
 
 Make a plot showing the 24-hour activity time courses for each day!
@@ -138,7 +152,7 @@ names(ny_noaa)
 head(ny_noaa)
 ```
 
-The NY NOAA dataset has `r nrow(ny_noaa)` rows and `r ncol(ny_noaa)` columns. The dataset contains `r sum(is.na(ny_noaa))` total missing observations which could cause some issues in deducing important statistics. Important variables are the weather station ID, date of observation, precipitation (mm), snowfall, snow depth (mm), maximum temperature, and minimum temperature.
+The NY NOAA dataset has `r nrow(ny_noaa)` rows and `r ncol(ny_noaa)` columns. The dataset contains `r sum(is.na(ny_noaa))` total missing observations which could cause some issues in deducing important descriptive statistics. Important variables are the weather station ID, date of observation, precipitation (mm), snowfall, snow depth (mm), maximum temperature, and minimum temperature. Some interesting values are the max snowfall recorded which is `r max(pull(ny_noaa, snow))` (mm), the max precipitation recorded which is `r max(pull(ny_noaa, prcp))` (mm), and the latest year of recorded observations which are in `r max(pull(ny_noaa, year))`.
 
 Do some data cleaning!
 
