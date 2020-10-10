@@ -144,6 +144,9 @@ accel_data %>%
   labs(x = "24 Hour Day", y = "Activity Counts")
 ```
 
+Fridays appear to be days where most activity occurs. Wednesdays have the lowest activity. Overall, this individual seems to be more active later in the week and between the middle and end of the day.
+
+
 ## Problem 3
 
 ```{r}
@@ -194,13 +197,11 @@ Make a two-panel plot!
 ```{r}
 avg_max_temp_jan_July_df =
   ny_noaa %>%
-  group_by(month, year, id) %>%
-  filter(month == 01, month == 07) %>%
-  summarize(average_max_temp = mean(tmax)
-  ) %>%
-  ggplot(aes(x = month, y = average_max_temp, group = id, color = id)) +
-  geom_point() +
-  facet_grid(. ~ month)
+    group_by(month, year, id) %>%
+    filter(month == 01, month == 07) %>%
+    ggplot(aes(x = month, y = mean(tmax), group = id, color = id)) +
+    geom_point() +
+    facet_grid(. ~ month)
 ```
 
 Make a two-panel plot showing tmax vs. tmin for the full dataset.
