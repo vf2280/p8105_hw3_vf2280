@@ -134,8 +134,14 @@ accel_data %>%
 Make a plot showing the 24-hour activity time courses for each day!
 
 ```{r}
-accel_data
-  
+accel_data %>%
+  mutate(
+    minute = minute/60
+  ) %>%
+  ggplot(aes(x = minute , y = activity_counts, color = day)) +
+  geom_point(alpha = 0.5) +
+  geom_smooth(se = FALSE) +
+  labs(x = "24 Hour Day", y = "Activity Counts")
 ```
 
 ## Problem 3
@@ -185,7 +191,7 @@ The most common values of snowfall are 25mm and 13mm. This could be because of t
 
 Make a two-panel plot!
 
-```{r not plotting?!}
+```{r}
 avg_max_temp_jan_July_df =
   ny_noaa %>%
   group_by(month, year, id) %>%
@@ -199,7 +205,7 @@ avg_max_temp_jan_July_df =
 
 Make a two-panel plot showing tmax vs. tmin for the full dataset.
 
-```{r not plotting?!}
+```{r}
 tmax_tmin_p =
   ny_noaa %>%
   summarize(average_max_temp = mean(tmax), average_min_temp = mean(tmin)
